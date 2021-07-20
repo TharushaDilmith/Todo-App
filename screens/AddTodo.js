@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View ,Button } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useLayoutEffect } from "react";
 import { Input } from "react-native-elements";
@@ -7,6 +7,7 @@ import { KeyboardAvoidingView } from "react-native";
 import { TouchableOpacity } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useState } from "react";
+
 
 const AddTodo = ({ navigation }) => {
   const [date, setDate] = useState(new Date(1598051730000));
@@ -17,11 +18,11 @@ const AddTodo = ({ navigation }) => {
     navigation.setOptions({
       title: "Add Todo",
       headerStyle: {
-        backgroundColor: "#00FFFF",
+        backgroundColor: "#2c6BED",
       },
       headerTitleStyle: {
-        alignSelf: "center",
-        marginRight: 30,
+        
+        color : '#fff'
       },
     });
   }, [navigation]);
@@ -50,14 +51,15 @@ const AddTodo = ({ navigation }) => {
     <>
       <StatusBar style="light" />
       <KeyboardAvoidingView>
-        <Input placeholder="name" />
-        <Input placeholder="description" />
+        <Input style={styles.input} autoFocus placeholder="name" />
+        <Input style={styles.input} placeholder="description" />
         <TouchableOpacity onPress={showDatePicker}>
-          <Input placeholder="Date" disabled  />
+          <Input style={styles.input} placeholder="Date" disabled  />
         </TouchableOpacity>
         <TouchableOpacity onPress={showTimePicker}>
-          <Input placeholder="Time" disabled />
+          <Input style={styles.input} placeholder="Time" disabled />
         </TouchableOpacity>
+        <Button title="Submit"  style={styles.button} />
       </KeyboardAvoidingView>
       {show && (
         <DateTimePicker
@@ -76,4 +78,12 @@ const AddTodo = ({ navigation }) => {
 
 export default AddTodo;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  input:{
+    paddingVertical:10,
+  },
+  button:{
+    padding:100,
+    fontSize:100
+  }
+});
