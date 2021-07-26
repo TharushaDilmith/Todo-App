@@ -1,18 +1,21 @@
 import React from "react";
-import { StyleSheet, Text, View ,Button } from "react-native";
+import { StyleSheet, Button } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useLayoutEffect } from "react";
 import { Input } from "react-native-elements";
 import { KeyboardAvoidingView } from "react-native";
 import { TouchableOpacity } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useState } from "react";
-
+import moment from "moment";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddTodo = ({ navigation }) => {
-  const [date, setDate] = useState(new Date(1598051730000));
-  const [mode, setMode] = useState("date");
-  const [show, setShow] = useState(false);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [choosedate, setchoosedate] = useState('');
+  const [name, setname] = useState('');
+  const [description, setdescription] = useState('');
+
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -21,57 +24,59 @@ const AddTodo = ({ navigation }) => {
         backgroundColor: "#2c6BED",
       },
       headerTitleStyle: {
-        
-        color : '#fff'
+        color: "#fff",
       },
     });
   }, [navigation]);
 
-  const onChange =(e,selectedDate)=>{
-      const currentDate = selectedDate || date;
-      setDate(currentDate);
-      setShow(false);
-
-  }
-
-  const showMode =(currentMode)=>{
-        setShow(true);
-        setMode(currentMode);
+  const saveData = async()=>{
+    let object ={
+      name,
+      description,
+      choosedate
+    }
+    try {
+      const jsonValue = JSON.stringify(object)
+      await AsyncStorage.setItem('@storage_Key:key', jsonValue)
+    } catch (e) {
+      // saving error
+    }
+    const getData = await AsyncStorage.getItem('@storage_Key:key')
+    getData != null ? JSON.parse(getData) : null;
+    console.log(getData);
+    
   }
 
   const showDatePicker = () => {
-      showMode('date');
-      
+    setDatePickerVisibility(true);
   };
-  const showTimePicker = () => {
-      showMode('time');
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (datetime) => {
+    setchoosedate(moment(datetime).format('LLL'))
+    hideDatePicker();
   };
 
   return (
     <>
       <StatusBar style="light" />
       <KeyboardAvoidingView>
-        <Input style={styles.input} autoFocus placeholder="name" />
-        <Input style={styles.input} placeholder="description" />
+        <Input style={styles.input} value={name} onChangeText={(text)=>setname(text)} autoFocus placeholder="name" />
+        <Input style={styles.input} value={description} onChangeText={(text)=>setdescription(text)} placeholder="description" />
         <TouchableOpacity onPress={showDatePicker}>
-          <Input style={styles.input} placeholder="Date" disabled  />
+          <Input style={styles.input} placeholder="date" value={choosedate} disabled />
         </TouchableOpacity>
-        <TouchableOpacity onPress={showTimePicker}>
-          <Input style={styles.input} placeholder="Time" disabled />
-        </TouchableOpacity>
-        <Button title="Submit"  style={styles.button} />
+        <Button title="Submit" style={styles.button} onPress={saveData} />
       </KeyboardAvoidingView>
-      {show && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={date}
-          mode={mode}
-          is24Hour={true}
-          display="default"
-          onChange={onChange}
-        />
-      )}
-
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="datetime"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
+      />
     </>
   );
 };
@@ -79,11 +84,11 @@ const AddTodo = ({ navigation }) => {
 export default AddTodo;
 
 const styles = StyleSheet.create({
-  input:{
-    paddingVertical:10,
+  input: {
+    paddingVertical: 10,
   },
-  button:{
-    padding:100,
-    fontSize:100
-  }
+  button: {
+    padding: 100,
+    fontSize: 100,
+  },
 });
