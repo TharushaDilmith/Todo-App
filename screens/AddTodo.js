@@ -33,7 +33,8 @@ const AddTodo = ({ navigation }) => {
     let object ={
       name,
       description,
-      choosedate
+      choosedate,
+      message :"hello",
     }
     try {
       const jsonValue = JSON.stringify(object)
@@ -41,6 +42,7 @@ const AddTodo = ({ navigation }) => {
     } catch (e) {
       // saving error
     }
+    //get data
     const getData = await AsyncStorage.getItem('@storage_Key:key')
     getData != null ? JSON.parse(getData) : null;
     console.log(getData);
